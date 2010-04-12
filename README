@@ -1,0 +1,10 @@
+Client library for onesocialweb protocol, using the Smack XMPP library. 
+
+Best to use this library only for desktop applications, another dedicated project will be available for Android (osw-lib-android) and GWT (osw-lib-gwt) based clients.
+
+Released under an Apache 2.0 License (see LICENSE).
+Copyright 2010 Vodafone Group Services Limited.
+
+All documentation and tutorials available on http://onesocialweb.org
+
+Version 0.6 - Released April 12th 2010

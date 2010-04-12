@@ -1,0 +1,9 @@
+1- Compiling the Onesocialweb client library (using Smack)
+
+- Make sure that 'ant' is installed on your system
+- Go in the main folder of the project
+- Type 'ant' 
+- The compiled jar is in build/jar/osw-lib-java.jar
+
+The library jar only contains the onesocialweb classes. When you use the library in a project, make sure
+that you also put the other dependencies in your classpath.

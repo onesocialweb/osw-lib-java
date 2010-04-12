@@ -1,0 +1,8 @@
+.buildpath
+.project
+.settings
+.classpath
+*.properties
+bin/
+build/
+doc/
