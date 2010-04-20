@@ -340,13 +340,14 @@ public class OswServiceImp implements OswService {
 	}
 
 	@Override
-	public List<String> getSubscriptions() throws RequestException, AuthenticationRequired, ConnectionRequired {
+	public List<String> getSubscriptions(String jid) throws RequestException, AuthenticationRequired, ConnectionRequired {
 		// Validate if we can actually do this
 		requiresConnection();
 		requiresAuth();
 
 		// Send the request
 		IQPubSubSubscriptions packet = new IQPubSubSubscriptions(ACTIVITYSTREAM_NODE);
+		packet.setTo(jid);
 		IQ result = requestBlocking(packet);
 
 		// Process the request
@@ -363,13 +364,14 @@ public class OswServiceImp implements OswService {
 	}
 	
 	@Override
-	public List<String> getSubscribers() throws RequestException, AuthenticationRequired, ConnectionRequired {
+	public List<String> getSubscribers(String jid) throws RequestException, AuthenticationRequired, ConnectionRequired {
 		// Validate if we can actually do this
 		requiresConnection();
 		requiresAuth();
 
 		// Send the request
 		IQPubSubSubscribers packet = new IQPubSubSubscribers(ACTIVITYSTREAM_NODE);
+		packet.setTo(jid);
 		IQ result = requestBlocking(packet);
 
 		// Process the request

@@ -164,27 +164,29 @@ public interface OswService {
 	
 	
 	/**
-	 * Queries the list of the jids that are currently subscribed to the connected user.
+	 * Queries the list of users that are currently subscribed to the given jid
 	 * 
+ 	 * @param userJid					jid of the user to fetch subscribers for
 	 * @return							a List of jids.
 	 * @throws RequestException			throws a RequestException if it receives a reply IQ of type ERROR after 
 	 * 									attempting to retrieve the list of subscribers from the server.
 	 * @throws ConnectionRequired		throws a ConnectionRequired exception if not connected to an XMPP Server.
 	 * @throws AuthenticationRequired	throws an AuthenticationRequired is no user has been logged in yet.
 	 */
-	public List<String> getSubscribers() throws RequestException, ConnectionRequired, AuthenticationRequired;
+	public List<String> getSubscribers(String jid) throws RequestException, ConnectionRequired, AuthenticationRequired;
 	
 	
 	/**
-	 * Queries the list of the jids that connected user is currently subscribed to.
+	 * Queries the list of users that the give jid is subscribed to
 	 * 
+	 * @param userJid					jid of the user to fetch subscriptions for
 	 * @return							a List of jids.
 	 * @throws RequestException			throws a RequestException if it receives a reply IQ of type ERROR after 
 	 * 									attempting to retrieve the list of subscriptions from the server.
 	 * @throws ConnectionRequired		throws a ConnectionRequired exception if not connected to an XMPP Server.
 	 * @throws AuthenticationRequired	throws an AuthenticationRequired is no user has been logged in yet.
 	 */
-	public List<String> getSubscriptions() throws RequestException, ConnectionRequired, AuthenticationRequired;
+	public List<String> getSubscriptions(String jid) throws RequestException, ConnectionRequired, AuthenticationRequired;
 
 	
 	/**
