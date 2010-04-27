@@ -35,6 +35,23 @@ public interface OswService {
  
 	/* Connection related commands */
 	
+    /**
+     * Sets if the connection is going to use stream compression. Stream compression
+     * will be requested after TLS was established (if TLS was enabled) and only if the server
+     * offered stream compression. With stream compression network traffic can be reduced
+     * up to 90%. By default compression is disabled.
+     *
+     * @param compressionEnabled if the connection is going to use stream compression.
+     */
+	public void setCompressionEnabled(boolean compressionEnabled);
+	
+    /**
+     * Sets if the reconnection mechanism is allowed to be used. By default
+     * reconnection is allowed.
+     * 
+     * @param isAllowed if the reconnection mechanism is allowed to use.
+     */
+	public void setReconnectionAllowed(boolean isAllowed);
 	
 	/**
 	 * Connects to the specified XMPP server

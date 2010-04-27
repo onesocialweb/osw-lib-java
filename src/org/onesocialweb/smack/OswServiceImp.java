@@ -73,7 +73,7 @@ import org.onesocialweb.xml.writer.ActivityXmlWriter;
 public class OswServiceImp implements OswService {
 	
 	private static final String ACTIVITYSTREAM_NODE = "urn:xmpp:microblog:0";
-	
+
 	/** The inbox of this logged in session */
 	private final Inbox inbox = new InboxImp(this);
 	
@@ -86,9 +86,14 @@ public class OswServiceImp implements OswService {
 	/** Keep track of the last present set by this client **/
 	private Presence currentPresence;
 	
+	/** Are we using compression ? **/
+	private boolean enableCompression = false;
+	
+	/** Are we using attempting to reconnect ? **/
+	private boolean enableReconnect = true;
+		
 	/** A reference to the current XMPP connection */
 	protected XMPPConnection connection;
-	
 	
 	@Override
 	public String getHostname() {
@@ -130,15 +135,23 @@ public class OswServiceImp implements OswService {
 	public boolean isConnected() {
 		return (connection != null && connection.isConnected());
 	}
+	
+	@Override
+	public void setCompressionEnabled(boolean compressionEnabled) {
+		this.enableCompression = compressionEnabled;
+	}
+
+	@Override
+	public void setReconnectionAllowed(boolean isAllowed) {
+		this.enableReconnect = isAllowed;
+	}
 		
 	@Override
 	public boolean connect(String server, Integer port, Map<String, String> parameters) throws ConnectionException {
-
-		ConnectionConfiguration config = new ConnectionConfiguration(server);
-
-		/*Enable compression*/
-		config.setCompressionEnabled(true);
-		config.setReconnectionAllowed(false);
+		
+		final ConnectionConfiguration config = new ConnectionConfiguration(server);
+		config.setCompressionEnabled(enableCompression);
+		config.setReconnectionAllowed(enableReconnect);
 		
 		connection = new XMPPConnection(config);
 
@@ -685,4 +698,5 @@ public class OswServiceImp implements OswService {
 			listener.onPresenceChanged(p);
 		}
 	}
+
 }
