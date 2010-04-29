@@ -241,7 +241,7 @@ public interface OswService {
 	public boolean postActivity(ActivityEntry entry) throws ConnectionRequired, AuthenticationRequired, RequestException;
 
 	
-	public boolean deleteActivity(String activityId);
+	public boolean deleteActivity(String activityId) throws ConnectionRequired, AuthenticationRequired, RequestException;
 
 	
 	public boolean updateActivity(ActivityEntry entry);

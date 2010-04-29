@@ -57,6 +57,7 @@ import org.onesocialweb.smack.packet.profile.IQProfilePublish;
 import org.onesocialweb.smack.packet.profile.IQProfileQuery;
 import org.onesocialweb.smack.packet.pubsub.IQPubSubItems;
 import org.onesocialweb.smack.packet.pubsub.IQPubSubPublish;
+import org.onesocialweb.smack.packet.pubsub.IQPubSubRetract;
 import org.onesocialweb.smack.packet.pubsub.IQPubSubSubscribe;
 import org.onesocialweb.smack.packet.pubsub.IQPubSubSubscribers;
 import org.onesocialweb.smack.packet.pubsub.IQPubSubSubscriptions;
@@ -208,9 +209,26 @@ public class OswServiceImp implements OswService {
 	}
 
 	@Override
-	public boolean deleteActivity(String activityId) {
+	public boolean deleteActivity(String activityId) throws ConnectionRequired, AuthenticationRequired, RequestException {
 		// TODO Auto-generated method stub
+		requiresConnection();
+		requiresAuth();
+						
+		IQPubSubRetract packet = new IQPubSubRetract(ACTIVITYSTREAM_NODE, activityId);
+		packet.setType(IQ.Type.SET);
+		
+		IQ result = requestBlocking(packet);
+
+		// Process the request
+		if (result != null) {
+			if (result.getType() == IQ.Type.ERROR) {
+				throw new RequestException("IQ error " + result.getError().getCondition());
+			} else {
+				return true;
+			}			
+		}
 		return false;
+
 	}
 
 	@Override
@@ -675,11 +693,20 @@ public class OswServiceImp implements OswService {
 		@Override
 		public void processPacket(Packet packet) {
 			if (packet instanceof Message) {
-				Message message = (Message) packet;
+				Message message = (Message) packet;				
 				MessagePubSubEvent update = (MessagePubSubEvent) message.getExtension("event", "http://jabber.org/protocol/pubsub#event");
+				
+				// String extName=message.getExtension("event", "http://jabber.org/protocol/pubsub#event").getElementName();
+				
 				if (update != null) {
-					for (ActivityEntry activity : update.getEntries()) {
-						inbox.addEntry(activity);
+					List <ActivityEntry> activities= update.getEntries();
+					if ((activities!=null) && (activities.size()>0)){
+						for (ActivityEntry activity : activities) {
+							inbox.addEntry(activity);
+						}
+					}
+					else {							
+						inbox.refresh();
 					}
 				}
 			}
