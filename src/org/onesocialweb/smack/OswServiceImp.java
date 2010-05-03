@@ -63,6 +63,8 @@ import org.onesocialweb.smack.packet.pubsub.IQPubSubSubscribers;
 import org.onesocialweb.smack.packet.pubsub.IQPubSubSubscriptions;
 import org.onesocialweb.smack.packet.pubsub.IQPubSubUnsubscribe;
 import org.onesocialweb.smack.packet.pubsub.MessagePubSubEvent;
+import org.onesocialweb.smack.packet.pubsub.MessagePubSubItems;
+import org.onesocialweb.smack.packet.pubsub.MessagePubSubRetract;
 import org.onesocialweb.smack.packet.pubsub.ProviderPubSubEvent;
 import org.onesocialweb.smack.packet.pubsub.ProviderPubSubIQ;
 import org.onesocialweb.smack.packet.relation.IQRelationProvider;
@@ -695,20 +697,22 @@ public class OswServiceImp implements OswService {
 			if (packet instanceof Message) {
 				Message message = (Message) packet;				
 				MessagePubSubEvent update = (MessagePubSubEvent) message.getExtension("event", "http://jabber.org/protocol/pubsub#event");
+								
+				if (update == null)
+					return;
 				
-				// String extName=message.getExtension("event", "http://jabber.org/protocol/pubsub#event").getElementName();
-				
-				if (update != null) {
-					List <ActivityEntry> activities= update.getEntries();
+				if (update instanceof MessagePubSubItems) {
+					List <ActivityEntry> activities= ((MessagePubSubItems)update).getEntries();
 					if ((activities!=null) && (activities.size()>0)){
 						for (ActivityEntry activity : activities) {
 							inbox.addEntry(activity);
 						}
 					}
-					else {							
+				} else if (update instanceof MessagePubSubRetract) {							
 						inbox.refresh();
-					}
 				}
+				
+				
 			}
 		}
 	}

@@ -34,24 +34,33 @@ public class ProviderPubSubEvent implements PacketExtensionProvider {
 
 		boolean done = false;
 		String node = new String();
+		String namespace= parser.getNamespace();
+		String id= new String();
+		MessagePubSubEvent message=null;
 
 		while (!done) {
 			int eventType = parser.next();
 			if (eventType == XmlPullParser.START_TAG) {
 				if (parser.getName().equals("items")) {
 					node = parser.getAttributeValue(null, "node");
-				} else if (parser.getName().equals("entry")) {
+				}				
+				else if (parser.getName().equals("entry")) {
+					message = new MessagePubSubItems(node);
 					entries.add(reader.parse(parser));
+				}
+				else if (parser.getName().equals("retract")) {
+					id= parser.getAttributeValue(namespace, "id");
+					 message = new MessagePubSubRetract(node, id);
 				}
 			} else if (eventType == XmlPullParser.END_TAG) {
 				if (parser.getName().equals("event")) {
 					done = true;
 				}
-			}
+			}			
 		}
 
-		MessagePubSubEvent message = new MessagePubSubEvent(node);
-		message.setEntries(entries);
+		if (message instanceof MessagePubSubItems)		
+			((MessagePubSubItems)message).setEntries(entries);
 		
 		return message;
 
