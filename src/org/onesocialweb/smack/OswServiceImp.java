@@ -232,6 +232,30 @@ public class OswServiceImp implements OswService {
 		return false;
 
 	}
+	
+	@Override
+	public boolean updateActivity(ActivityEntry entry) throws ConnectionRequired, AuthenticationRequired, RequestException {
+		// TODO Auto-generated method stub
+		requiresConnection();
+		requiresAuth();
+						
+		ActivityXmlWriter writer = new ActivityXmlWriter();
+		IQPubSubPublish packet = new IQPubSubPublish(ACTIVITYSTREAM_NODE, writer.toXml(entry));
+		packet.setType(IQ.Type.SET);
+		
+		IQ result = requestBlocking(packet);
+
+		// Process the request
+		if (result != null) {
+			if (result.getType() == IQ.Type.ERROR) {
+				throw new RequestException("IQ error " + result.getError().getCondition());
+			} else {
+				return true;
+			}			
+		}
+		return false;
+
+	}
 
 	@Override
 	public boolean subscribe(String userJid) throws RequestException, ConnectionRequired, AuthenticationRequired {
@@ -420,11 +444,6 @@ public class OswServiceImp implements OswService {
 		return null;
 	}
 	
-	@Override
-	public boolean updateActivity(ActivityEntry entry) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 	public boolean refreshInbox() throws ConnectionRequired, AuthenticationRequired, RequestException {
 		// Validate if we can actually do this
@@ -701,16 +720,17 @@ public class OswServiceImp implements OswService {
 				if (update == null)
 					return;
 				
-				if (update instanceof MessagePubSubItems) {
-					List <ActivityEntry> activities= ((MessagePubSubItems)update).getEntries();
+				if ((update instanceof MessagePubSubItems) || (update instanceof MessagePubSubRetract)) {
+				/*	List <ActivityEntry> activities= ((MessagePubSubItems)update).getEntries();
 					if ((activities!=null) && (activities.size()>0)){
 						for (ActivityEntry activity : activities) {
 							inbox.addEntry(activity);
 						}
-					}
-				} else if (update instanceof MessagePubSubRetract) {							
+					} */
+					inbox.refresh();
+				}/* else if (update instanceof MessagePubSubRetract) {							
 						inbox.refresh();
-				}
+				} */
 				
 				
 			}

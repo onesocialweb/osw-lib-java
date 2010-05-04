@@ -241,10 +241,31 @@ public interface OswService {
 	public boolean postActivity(ActivityEntry entry) throws ConnectionRequired, AuthenticationRequired, RequestException;
 
 	
+	/**
+	 * Tries to delete the activity (if posted by the user) and to notify all subscribers. 
+	 * If the activity was not posted by the user in the first place, it will throw 
+	 * 
+	 * @param activityId					An ActivityId. See: http://onesocialweb.org/spec/1.0/xep-osw-activities.html
+	 * @return								true if it succeeded in deleting the activity at the server 
+	 * 										i.e. if it receives a reply IQ of type RESULT. 
+	 * @throws ConnectionRequired			throws a ConnectionRequired exception if not connected to an XMPP Server.
+	 * @throws AuthenticationRequired  		throws an AuthenticationRequired is no user has been logged in yet.
+	 * @throws RequestException				throws a RequestException if it receives from the server a reply IQ  of
+	 * 										type ERROR.
+	 */
 	public boolean deleteActivity(String activityId) throws ConnectionRequired, AuthenticationRequired, RequestException;
 
 	
-	public boolean updateActivity(ActivityEntry entry);
+	/**
+	 * @param activityId					An ActivityEntry. See: http://onesocialweb.org/spec/1.0/xep-osw-activities.html
+	 * @return								true if it succeeded in updating the activity at the server 
+	 * 										i.e. if it receives a reply IQ of type RESULT. 
+	 * @throws ConnectionRequired			throws a ConnectionRequired exception if not connected to an XMPP Server.
+	 * @throws AuthenticationRequired  		throws an AuthenticationRequired is no user has been logged in yet.
+	 * @throws RequestException				throws a RequestException if it receives from the server a reply IQ  of
+	 * 										type ERROR.
+	 */
+	public boolean updateActivity(ActivityEntry entry) throws ConnectionRequired, AuthenticationRequired, RequestException;
 	
 	/* Profile related commands */
 	
