@@ -404,7 +404,9 @@ public class OswServiceImp implements OswService {
 
 		// Send the request
 		IQPubSubSubscriptions packet = new IQPubSubSubscriptions(ACTIVITYSTREAM_NODE);
-		packet.setTo(jid);
+		if (!jid.equals(getBareJID())) {
+			packet.setTo(jid);	
+		}
 		IQ result = requestBlocking(packet);
 
 		// Process the request
@@ -428,7 +430,9 @@ public class OswServiceImp implements OswService {
 
 		// Send the request
 		IQPubSubSubscribers packet = new IQPubSubSubscribers(ACTIVITYSTREAM_NODE);
-		packet.setTo(jid);
+		if (!jid.equals(getBareJID())) {
+			packet.setTo(jid);	
+		}
 		IQ result = requestBlocking(packet);
 
 		// Process the request

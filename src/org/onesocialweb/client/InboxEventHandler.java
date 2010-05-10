@@ -16,8 +16,16 @@
  */
 package org.onesocialweb.client;
 
+import java.util.List;
+
+import org.onesocialweb.model.activity.ActivityEntry;
+
 public interface InboxEventHandler {
 
-	public void handleEvent(InboxEvent event);
+	public void onMessageReceived(ActivityEntry entry);
+	
+	public void onMessageDeleted(ActivityEntry entry);
+	
+	public void onRefresh(List<ActivityEntry> activities);
 	
 }
