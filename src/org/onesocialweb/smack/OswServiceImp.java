@@ -724,19 +724,14 @@ public class OswServiceImp implements OswService {
 				if (update == null)
 					return;
 				
-				if ((update instanceof MessagePubSubItems) || (update instanceof MessagePubSubRetract)) {
-				/*	List <ActivityEntry> activities= ((MessagePubSubItems)update).getEntries();
+				if (update instanceof MessagePubSubItems) {
+					List <ActivityEntry> activities= ((MessagePubSubItems)update).getEntries();
 					if ((activities!=null) && (activities.size()>0)){
 						for (ActivityEntry activity : activities) {
 							inbox.addEntry(activity);
 						}
-					} */
-					inbox.refresh();
-				}/* else if (update instanceof MessagePubSubRetract) {							
-						inbox.refresh();
-				} */
-				
-				
+					}
+				}
 			}
 		}
 	}
