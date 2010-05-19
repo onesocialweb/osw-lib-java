@@ -269,6 +269,8 @@ public interface OswService {
 	
 	/* Profile related commands */
 	
+	public List<ActivityEntry> getReplies(ActivityEntry entry) throws ConnectionRequired, AuthenticationRequired, RequestException;
+	
 	
 	/**
 	 * Retrieves from the XMPP server a complete profile by trying to send an IQ of type IQProfileQuery.
