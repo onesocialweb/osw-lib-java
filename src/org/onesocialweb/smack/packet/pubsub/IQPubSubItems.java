@@ -43,7 +43,14 @@ public class IQPubSubItems extends IQ {
 	public String getChildElementXML() {
 		final StringBuffer buf = new StringBuffer();
 		buf.append("<pubsub xmlns='http://jabber.org/protocol/pubsub'>");
-		buf.append("<items node='" + node + "' />");
+		if ((entries==null) || (entries.size()==0))
+			buf.append("<items node='" + node + "' />");
+		else {
+			buf.append("<items node='" + node + "' >");
+			buf.append("<item id='"+ entries.get(0).getId() +"'>" );
+		    buf.append("</item>");  
+		    buf.append("</items>");
+		}
 		buf.append("</pubsub>");
 		return buf.toString();
 	}

@@ -19,6 +19,7 @@ package org.onesocialweb.smack;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,7 @@ import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smack.packet.RosterPacket;
@@ -76,6 +78,8 @@ import org.onesocialweb.xml.writer.ActivityXmlWriter;
 public class OswServiceImp implements OswService {
 	
 	private static final String ACTIVITYSTREAM_NODE = "urn:xmpp:microblog:0";
+	
+	private static final String REPLYSTREAM_NODE = "http://onesocialweb.org/spec/1.0/replies";
 
 	/** The inbox of this logged in session */
 	private final Inbox inbox = new InboxImp(this);
@@ -233,7 +237,7 @@ public class OswServiceImp implements OswService {
 
 	}
 	
-	@Override
+	
 	public boolean updateActivity(ActivityEntry entry) throws ConnectionRequired, AuthenticationRequired, RequestException {
 		// TODO Auto-generated method stub
 		requiresConnection();
@@ -255,6 +259,34 @@ public class OswServiceImp implements OswService {
 		}
 		return false;
 
+	}
+	
+	@Override
+	public List<ActivityEntry> getReplies(ActivityEntry entry) throws ConnectionRequired, AuthenticationRequired, RequestException{
+		
+		requiresConnection();
+		requiresAuth();
+
+		// Send the request
+		IQPubSubItems packet = new IQPubSubItems(REPLYSTREAM_NODE);
+		List<ActivityEntry> request=new ArrayList<ActivityEntry>();
+		request.add(entry);
+		packet.setEntries(request);
+		packet.setTo(entry.getActor().getUri());
+		IQ result = requestBlocking(packet);
+
+		// Process the request
+		if (result != null) {
+			if (result.getType() == IQ.Type.ERROR) {
+				throw new RequestException("IQ error " + result.getError().getCondition());
+			} else if (result instanceof IQPubSubItems) {
+				IQPubSubItems query = (IQPubSubItems) result;
+				return query.getEntries();
+			}
+		}
+
+		return null;
+		
 	}
 
 	@Override
@@ -372,6 +404,8 @@ public class OswServiceImp implements OswService {
 		}
 		return false;
 	}
+	
+
 
 	@Override
 	public boolean unsubscribe(String userJid) throws RequestException, ConnectionRequired, AuthenticationRequired {
