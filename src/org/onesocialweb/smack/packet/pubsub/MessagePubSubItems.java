@@ -27,12 +27,6 @@ public class MessagePubSubItems extends MessagePubSubEvent {
 
 	private List<ActivityEntry> entries;
 
-	@Override
-	public String getElementName() {
-		return "event";
-	}
-
-
 	public MessagePubSubItems(String node) {
 		this.node = node;
 	}

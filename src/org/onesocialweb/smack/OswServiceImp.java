@@ -64,6 +64,7 @@ import org.onesocialweb.smack.packet.pubsub.IQPubSubSubscriptions;
 import org.onesocialweb.smack.packet.pubsub.IQPubSubUnsubscribe;
 import org.onesocialweb.smack.packet.pubsub.MessagePubSubEvent;
 import org.onesocialweb.smack.packet.pubsub.MessagePubSubItems;
+import org.onesocialweb.smack.packet.pubsub.MessagePubSubRetract;
 import org.onesocialweb.smack.packet.pubsub.ProviderPubSubEvent;
 import org.onesocialweb.smack.packet.pubsub.ProviderPubSubIQ;
 import org.onesocialweb.smack.packet.relation.IQRelationProvider;
@@ -713,17 +714,29 @@ public class OswServiceImp implements OswService {
 		public void processPacket(Packet packet) {
 			if (packet instanceof Message) {
 				Message message = (Message) packet;				
-				MessagePubSubEvent update = (MessagePubSubEvent) message.getExtension("event", "http://jabber.org/protocol/pubsub#event");
+				MessagePubSubEvent eventPacket = (MessagePubSubEvent) message.getExtension("event", "http://jabber.org/protocol/pubsub#event");
 								
-				if (update == null)
+				if (eventPacket == null)
 					return;
 				
-				if (update instanceof MessagePubSubItems) {
-					List <ActivityEntry> activities= ((MessagePubSubItems)update).getEntries();
+				if (eventPacket instanceof MessagePubSubItems) {
+					List <ActivityEntry> activities= ((MessagePubSubItems)eventPacket).getEntries();
 					if ((activities!=null) && (activities.size()>0)){
 						for (ActivityEntry activity : activities) {
-							inbox.addEntry(activity);
+							// Search if the activity is already in the inbox
+							ActivityEntry previousActivity = inbox.getEntry(activity.getId());
+							if (previousActivity != null) {
+								inbox.updateEntry(activity);
+							} else {
+								inbox.addEntry(activity);
+							}
 						}
+					}
+				} else if (eventPacket instanceof MessagePubSubRetract) {
+					String activityId = ((MessagePubSubRetract) eventPacket).getId();
+					ActivityEntry entry = inbox.getEntry(activityId);
+					if (entry != null) {
+						inbox.removeEntry(entry);
 					}
 				}
 			}

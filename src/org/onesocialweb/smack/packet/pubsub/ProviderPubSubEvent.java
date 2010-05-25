@@ -49,7 +49,7 @@ public class ProviderPubSubEvent implements PacketExtensionProvider {
 					entries.add(reader.parse(parser));
 				}
 				else if (parser.getName().equals("retract")) {
-					id= parser.getAttributeValue(namespace, "id");
+					id= parser.getAttributeValue(null, "id");
 					 message = new MessagePubSubRetract(node, id);
 				}
 			} else if (eventType == XmlPullParser.END_TAG) {

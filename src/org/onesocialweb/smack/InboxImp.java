@@ -78,6 +78,17 @@ public class InboxImp implements Inbox {
 		entries.remove(entry);
 		notifyMessageDeleted(entry);
 	}
+	
+	@Override
+	public void updateEntry(ActivityEntry entry) {
+		ActivityEntry previousActivity = getEntry(entry.getId());
+		if (previousActivity != null) {
+			int index = entries.indexOf(previousActivity);
+			entries.add(index, entry);
+			entries.remove(previousActivity);
+			notifyMessageUpdated(entry);
+		}
+	}
 
 	@Override
 	public void setEntries(List<ActivityEntry> entries) {
@@ -90,6 +101,12 @@ public class InboxImp implements Inbox {
 			handler.onMessageReceived(activity);
 		}
 	}
+	
+	private void notifyMessageUpdated(ActivityEntry activity) {
+		for (InboxEventHandler handler : handlers) {
+			handler.onMessageUpdated(activity);
+		}
+	}	
 	
 	private void notifyMessageDeleted(ActivityEntry activity) {
 		for (InboxEventHandler handler : handlers) {
@@ -110,6 +127,16 @@ public class InboxImp implements Inbox {
 		} else {
 			return 0;
 		}
+	}
+
+	@Override
+	public ActivityEntry getEntry(String id) {
+		for (ActivityEntry entry : entries) {
+			if (entry.getId().equals(id)) {
+				return entry;
+			}
+		}
+		return null;
 	}
 
 }

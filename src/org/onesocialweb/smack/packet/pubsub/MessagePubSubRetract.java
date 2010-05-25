@@ -11,13 +11,6 @@ public class MessagePubSubRetract extends MessagePubSubEvent {
 		return id;
 	}
 
-	@Override
-	public String getElementName() {
-		return "retract";
-	}
-
-
-
 	public MessagePubSubRetract(String node, String id) {
 		this.node = node;
 		this.id=id;

@@ -26,6 +26,8 @@ public interface InboxEventHandler {
 	
 	public void onMessageDeleted(ActivityEntry entry);
 	
+	public void onMessageUpdated(ActivityEntry entry);
+	
 	public void onRefresh(List<ActivityEntry> activities);
 	
 }

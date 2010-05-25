@@ -8,4 +8,9 @@ public abstract class MessagePubSubEvent implements PacketExtension{
 	public String getNamespace() {
 		return "http://jabber.org/protocol/pubsub#event";
 	}
+	
+	@Override
+	public String getElementName() {
+		return "event";
+	}
 }

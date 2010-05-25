@@ -22,6 +22,8 @@ import org.onesocialweb.model.activity.ActivityEntry;
 
 public interface Inbox {
 	
+	public ActivityEntry getEntry(String id);
+	
 	public List<ActivityEntry> getEntries();
 	
 	public void setEntries(List<ActivityEntry> entries);
@@ -29,6 +31,8 @@ public interface Inbox {
 	public void addEntry(ActivityEntry entry);
 	
 	public void removeEntry(ActivityEntry entry);
+	
+	public void updateEntry(ActivityEntry entry);
 	
 	public boolean refresh();
 	
