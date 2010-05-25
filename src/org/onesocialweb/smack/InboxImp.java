@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.onesocialweb.client.Inbox;
-import org.onesocialweb.client.InboxEvent;
 import org.onesocialweb.client.InboxEventHandler;
 import org.onesocialweb.client.exception.AuthenticationRequired;
 import org.onesocialweb.client.exception.ConnectionRequired;
@@ -71,24 +70,36 @@ public class InboxImp implements Inbox {
 	@Override
 	public void addEntry(ActivityEntry entry) {
 		entries.add(0, entry);
-		fireEvent(new InboxEventImp());
+		notifyMessageReceived(entry);
 	}
 
 	@Override
 	public void removeEntry(ActivityEntry entry) {
 		entries.remove(entry);
-		fireEvent(new InboxEventImp());
+		notifyMessageDeleted(entry);
 	}
 
 	@Override
 	public void setEntries(List<ActivityEntry> entries) {
 		this.entries = entries;
-		fireEvent(new InboxEventImp());
+		notifyRefresh(entries);
 	}
 	
-	private void fireEvent(InboxEvent event) {
+	private void notifyMessageReceived(ActivityEntry activity) {
 		for (InboxEventHandler handler : handlers) {
-			handler.handleEvent(event);
+			handler.onMessageReceived(activity);
+		}
+	}
+	
+	private void notifyMessageDeleted(ActivityEntry activity) {
+		for (InboxEventHandler handler : handlers) {
+			handler.onMessageDeleted(activity);
+		}
+	}
+	
+	private void notifyRefresh(List<ActivityEntry> activities) {
+		for (InboxEventHandler handler : handlers) {
+			handler.onRefresh(activities);
 		}
 	}
 

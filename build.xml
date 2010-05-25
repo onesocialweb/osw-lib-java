@@ -8,10 +8,14 @@
     <property name="jar.name"    value="osw-lib-java"/>	
     <property name="lib.dir"     value="lib"/>
 	
+	<property file="${user.home}/.ant.build.properties" />
     <property file="${basedir}/build.properties"/>
+	
+	<fail unless="onesocialweb.libs">Aborting. The Ant property "onesocialweb.libs" is not defined. Check the onesocialweb wiki (Building with Ant) for more details on this error.</fail>
 	
     <path id="classpath">
         <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    	<fileset dir="${onesocialweb.libs}" includes="**/*.jar"/>
     </path>
 
     <target name="clean">
@@ -28,6 +32,10 @@
         <jar destfile="${jar.dir}/${jar.name}.jar" basedir="${classes.dir}" />
     </target>
 
+	<target name="deploy" depends="jar">
+	  <copy file="${jar.dir}/${jar.name}.jar" todir="${onesocialweb.libs}" overwrite="true" />
+	</target>
+	
     <target name="clean-build" depends="clean,jar"/>
 
     <target name="main" depends="clean,jar"/>

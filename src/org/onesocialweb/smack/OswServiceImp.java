@@ -57,11 +57,13 @@ import org.onesocialweb.smack.packet.profile.IQProfilePublish;
 import org.onesocialweb.smack.packet.profile.IQProfileQuery;
 import org.onesocialweb.smack.packet.pubsub.IQPubSubItems;
 import org.onesocialweb.smack.packet.pubsub.IQPubSubPublish;
+import org.onesocialweb.smack.packet.pubsub.IQPubSubRetract;
 import org.onesocialweb.smack.packet.pubsub.IQPubSubSubscribe;
 import org.onesocialweb.smack.packet.pubsub.IQPubSubSubscribers;
 import org.onesocialweb.smack.packet.pubsub.IQPubSubSubscriptions;
 import org.onesocialweb.smack.packet.pubsub.IQPubSubUnsubscribe;
 import org.onesocialweb.smack.packet.pubsub.MessagePubSubEvent;
+import org.onesocialweb.smack.packet.pubsub.MessagePubSubItems;
 import org.onesocialweb.smack.packet.pubsub.ProviderPubSubEvent;
 import org.onesocialweb.smack.packet.pubsub.ProviderPubSubIQ;
 import org.onesocialweb.smack.packet.relation.IQRelationProvider;
@@ -73,7 +75,7 @@ import org.onesocialweb.xml.writer.ActivityXmlWriter;
 public class OswServiceImp implements OswService {
 	
 	private static final String ACTIVITYSTREAM_NODE = "urn:xmpp:microblog:0";
-	
+
 	/** The inbox of this logged in session */
 	private final Inbox inbox = new InboxImp(this);
 	
@@ -86,9 +88,14 @@ public class OswServiceImp implements OswService {
 	/** Keep track of the last present set by this client **/
 	private Presence currentPresence;
 	
+	/** Are we using compression ? **/
+	private boolean enableCompression = false;
+	
+	/** Are we using attempting to reconnect ? **/
+	private boolean enableReconnect = true;
+		
 	/** A reference to the current XMPP connection */
 	protected XMPPConnection connection;
-	
 	
 	@Override
 	public String getHostname() {
@@ -130,15 +137,23 @@ public class OswServiceImp implements OswService {
 	public boolean isConnected() {
 		return (connection != null && connection.isConnected());
 	}
+	
+	@Override
+	public void setCompressionEnabled(boolean compressionEnabled) {
+		this.enableCompression = compressionEnabled;
+	}
+
+	@Override
+	public void setReconnectionAllowed(boolean isAllowed) {
+		this.enableReconnect = isAllowed;
+	}
 		
 	@Override
 	public boolean connect(String server, Integer port, Map<String, String> parameters) throws ConnectionException {
-
-		ConnectionConfiguration config = new ConnectionConfiguration(server);
-
-		/*Enable compression*/
-		config.setCompressionEnabled(true);
-		config.setReconnectionAllowed(false);
+		
+		final ConnectionConfiguration config = new ConnectionConfiguration(server);
+		config.setCompressionEnabled(enableCompression);
+		config.setReconnectionAllowed(enableReconnect);
 		
 		connection = new XMPPConnection(config);
 
@@ -195,9 +210,50 @@ public class OswServiceImp implements OswService {
 	}
 
 	@Override
-	public boolean deleteActivity(String activityId) {
+	public boolean deleteActivity(String activityId) throws ConnectionRequired, AuthenticationRequired, RequestException {
 		// TODO Auto-generated method stub
+		requiresConnection();
+		requiresAuth();
+						
+		IQPubSubRetract packet = new IQPubSubRetract(ACTIVITYSTREAM_NODE, activityId);
+		packet.setType(IQ.Type.SET);
+		
+		IQ result = requestBlocking(packet);
+
+		// Process the request
+		if (result != null) {
+			if (result.getType() == IQ.Type.ERROR) {
+				throw new RequestException("IQ error " + result.getError().getCondition());
+			} else {
+				return true;
+			}			
+		}
 		return false;
+
+	}
+	
+	@Override
+	public boolean updateActivity(ActivityEntry entry) throws ConnectionRequired, AuthenticationRequired, RequestException {
+		// TODO Auto-generated method stub
+		requiresConnection();
+		requiresAuth();
+						
+		ActivityXmlWriter writer = new ActivityXmlWriter();
+		IQPubSubPublish packet = new IQPubSubPublish(ACTIVITYSTREAM_NODE, writer.toXml(entry));
+		packet.setType(IQ.Type.SET);
+		
+		IQ result = requestBlocking(packet);
+
+		// Process the request
+		if (result != null) {
+			if (result.getType() == IQ.Type.ERROR) {
+				throw new RequestException("IQ error " + result.getError().getCondition());
+			} else {
+				return true;
+			}			
+		}
+		return false;
+
 	}
 
 	@Override
@@ -385,12 +441,6 @@ public class OswServiceImp implements OswService {
 		}
 
 		return null;
-	}
-	
-	@Override
-	public boolean updateActivity(ActivityEntry entry) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	public boolean refreshInbox() throws ConnectionRequired, AuthenticationRequired, RequestException {
@@ -662,11 +712,18 @@ public class OswServiceImp implements OswService {
 		@Override
 		public void processPacket(Packet packet) {
 			if (packet instanceof Message) {
-				Message message = (Message) packet;
+				Message message = (Message) packet;				
 				MessagePubSubEvent update = (MessagePubSubEvent) message.getExtension("event", "http://jabber.org/protocol/pubsub#event");
-				if (update != null) {
-					for (ActivityEntry activity : update.getEntries()) {
-						inbox.addEntry(activity);
+								
+				if (update == null)
+					return;
+				
+				if (update instanceof MessagePubSubItems) {
+					List <ActivityEntry> activities= ((MessagePubSubItems)update).getEntries();
+					if ((activities!=null) && (activities.size()>0)){
+						for (ActivityEntry activity : activities) {
+							inbox.addEntry(activity);
+						}
 					}
 				}
 			}
@@ -685,4 +742,5 @@ public class OswServiceImp implements OswService {
 			listener.onPresenceChanged(p);
 		}
 	}
+
 }
