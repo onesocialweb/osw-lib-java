@@ -152,7 +152,7 @@ public class OswServiceImp implements OswService {
 	@Override
 	public boolean connect(String server, Integer port, Map<String, String> parameters) throws ConnectionException {
 		
-		final ConnectionConfiguration config = new ConnectionConfiguration(server);
+		final ConnectionConfiguration config = new ConnectionConfiguration(server, port);
 		config.setCompressionEnabled(enableCompression);
 		config.setReconnectionAllowed(enableReconnect);
 		
