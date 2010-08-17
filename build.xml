@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< HEAD
 <project name="OneSocialWeb java client library" basedir="." default="main">
+=======
+<project name="OneSocialWeb java library" basedir="." default="main">
+>>>>>>> 46b6336... change description message in the build file
 
     <property name="src.dir"     value="src"/>
     <property name="build.dir"   value="build"/>
