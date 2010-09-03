@@ -6,3 +6,5 @@
 bin/
 build/
 doc/
+target
+semantic.cache
