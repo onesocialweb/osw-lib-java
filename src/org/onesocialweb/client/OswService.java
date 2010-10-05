@@ -239,6 +239,17 @@ public interface OswService {
 	 * 										type ERROR.
 	 */
 	public boolean postActivity(ActivityEntry entry) throws ConnectionRequired, AuthenticationRequired, RequestException;
+	
+	/**
+	 * @param entry							An ActivityEntry. See: http://onesocialweb.org/spec/1.0/xep-osw-activities.html
+	 * @return								true if it succeeded in posting the comment to the server 
+	 * 										i.e. if it receives a reply IQ of type RESULT. 
+	 * @throws ConnectionRequired			throws a ConnectionRequired exception if not connected to an XMPP Server.
+	 * @throws AuthenticationRequired  		throws an AuthenticationRequired is no user has been logged in yet.
+	 * @throws RequestException				throws a RequestException if it receives from the server a reply IQ  of
+	 * 										type ERROR.
+	 */
+	public boolean postComment(ActivityEntry entry) throws ConnectionRequired, AuthenticationRequired, RequestException;
 
 	
 	/**

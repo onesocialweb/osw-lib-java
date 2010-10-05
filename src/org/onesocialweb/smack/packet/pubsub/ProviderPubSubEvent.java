@@ -22,6 +22,7 @@ import java.util.List;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.PacketExtensionProvider;
 import org.onesocialweb.model.activity.ActivityEntry;
+import org.onesocialweb.model.atom.AtomReplyTo;
 import org.onesocialweb.xml.xpp.imp.DefaultXppActivityReader;
 import org.xmlpull.v1.XmlPullParser;
 
@@ -46,7 +47,9 @@ public class ProviderPubSubEvent implements PacketExtensionProvider {
 				}				
 				else if (parser.getName().equals("entry")) {
 					message = new MessagePubSubItems(node);
-					entries.add(reader.parse(parser));
+					//set the parentId and Jid...
+					ActivityEntry entry=reader.parse(parser);										
+					entries.add(entry);
 				}
 				else if (parser.getName().equals("retract")) {
 					id= parser.getAttributeValue(null, "id");

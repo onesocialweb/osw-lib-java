@@ -79,7 +79,7 @@ public class OswServiceImp implements OswService {
 	
 	private static final String ACTIVITYSTREAM_NODE = "urn:xmpp:microblog:0";
 	
-	private static final String REPLYSTREAM_NODE = "http://onesocialweb.org/spec/1.0/replies";
+	private static final String REPLYSTREAM_NODE = "urn:xmpp:microblog:0:replies:item=";
 
 	/** The inbox of this logged in session */
 	private final Inbox inbox = new InboxImp(this);
@@ -268,7 +268,7 @@ public class OswServiceImp implements OswService {
 		requiresAuth();
 
 		// Send the request
-		IQPubSubItems packet = new IQPubSubItems(REPLYSTREAM_NODE);
+		IQPubSubItems packet = new IQPubSubItems(REPLYSTREAM_NODE+entry.getId());
 		List<ActivityEntry> request=new ArrayList<ActivityEntry>();
 		request.add(entry);
 		packet.setEntries(request);
@@ -389,6 +389,30 @@ public class OswServiceImp implements OswService {
 		
 		ActivityXmlWriter writer = new ActivityXmlWriter();
 		IQPubSubPublish packet = new IQPubSubPublish(ACTIVITYSTREAM_NODE, writer.toXml(entry));
+		packet.setType(IQ.Type.SET);
+		
+		IQ result = requestBlocking(packet);
+
+		// Process the request
+		if (result != null) {
+			if (result.getType() == IQ.Type.ERROR) {
+				throw new RequestException("IQ error " + result.getError().getCondition());
+			} else {
+				return true;
+			}
+			
+		}
+		return false;
+	}
+	
+	@Override
+	public boolean postComment(ActivityEntry entry) throws ConnectionRequired, AuthenticationRequired, RequestException {
+		requiresConnection();
+		requiresAuth();
+		
+		ActivityXmlWriter writer = new ActivityXmlWriter();
+		IQPubSubPublish packet = new IQPubSubPublish(REPLYSTREAM_NODE + entry.getParentId(), writer.toXml(entry));
+		
 		packet.setType(IQ.Type.SET);
 		
 		IQ result = requestBlocking(packet);
@@ -765,7 +789,7 @@ public class OswServiceImp implements OswService {
 							ActivityEntry previousActivity = inbox.getEntry(activity.getId());
 							if (previousActivity != null) {
 								inbox.updateEntry(activity);
-							} else {
+							} else if ((activity.getParentId()==null)  && (activity.getParentJID()==null)) {
 								inbox.addEntry(activity);
 							}
 						}
