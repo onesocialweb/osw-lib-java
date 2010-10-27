@@ -22,6 +22,8 @@ import java.util.Map;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smack.packet.Presence.Type;
+import org.jivesoftware.smackx.FormField;
+import org.jivesoftware.smackx.packet.DataForm;
 import org.onesocialweb.client.exception.AuthenticationRequired;
 import org.onesocialweb.client.exception.ConnectionException;
 import org.onesocialweb.client.exception.ConnectionRequired;
@@ -87,6 +89,10 @@ public interface OswService {
 	 * @throws ConnectionRequired  	will throw an exception if the service was not connected.
 	 */
 	public boolean register(String username, String password, String name, String email) throws ConnectionRequired;
+	
+	public boolean register(List<FormField> fields) throws ConnectionRequired;
+	
+	public DataForm requestForm() throws ConnectionRequired;
 
 	
 	/**

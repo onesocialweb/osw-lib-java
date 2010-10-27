@@ -43,6 +43,8 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smack.packet.RosterPacket;
 import org.jivesoftware.smack.provider.ProviderManager;
+import org.jivesoftware.smackx.FormField;
+import org.jivesoftware.smackx.packet.DataForm;
 import org.onesocialweb.client.ConnectionStateListener;
 import org.onesocialweb.client.Inbox;
 import org.onesocialweb.client.OswService;
@@ -212,6 +214,67 @@ public class OswServiceImp implements OswService {
 		}
 
 		return false;
+	}
+	
+	@Override
+	public boolean register(List<FormField> items) throws ConnectionRequired {
+		requiresConnection();
+
+		Registration query = new Registration();
+		query.setType(IQ.Type.SET);
+		DataForm form = new DataForm("submit");
+		
+		FormField field =new FormField(); 
+		field.setType(FormField.TYPE_HIDDEN);
+        field.addValue("jabber:iq:register");
+        form.addField(field);
+        
+        Iterator<FormField> it= items.iterator();
+        
+        for (;it.hasNext();){
+        	
+        	form.addField(it.next());
+        }
+		
+		
+		query.addExtension(form);
+
+		// Send the request and process the reply
+		Packet reply = requestBlocking(query);
+
+		if (reply != null && (reply instanceof IQ)) {
+			IQ result = (IQ) reply;
+			if (result.getType().equals(IQ.Type.RESULT)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
+	@Override
+	public DataForm requestForm() throws ConnectionRequired {
+		requiresConnection();
+
+		
+		Registration query = new Registration();
+		query.setType(IQ.Type.GET);	
+
+		// Send the request and process the reply
+		Packet reply = requestBlocking(query);
+
+		if (reply != null && (reply instanceof IQ)) {
+			IQ result = (IQ) reply;
+			if (result.getType().equals(IQ.Type.RESULT)) {
+				PacketExtension extension= result.getExtension("jabber:x:data");
+				if (extension instanceof DataForm){
+					DataForm requiredData= (DataForm)extension;
+					 return requiredData;
+				}									
+			}
+		}
+
+		return null;
 	}
 
 	@Override
