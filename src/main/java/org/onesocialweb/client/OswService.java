@@ -19,6 +19,7 @@ package org.onesocialweb.client;
 import java.util.List;
 import java.util.Map;
 
+import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smack.packet.Presence.Type;
@@ -219,6 +220,8 @@ public interface OswService {
 	 * 				The inbox is refreshed upon actions such as OswService login and disconnect.
 	 */
 	public Inbox getInbox();
+	
+	public Roster getRoster();
 	
 	
 	/**

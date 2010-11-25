@@ -568,6 +568,10 @@ public class OswServiceImp implements OswService {
 
 		return null;
 	}
+	
+	public Roster getRoster(){
+		return connection.getRoster();
+	}
 
 	public boolean refreshInbox() throws ConnectionRequired, AuthenticationRequired, RequestException {
 		// Validate if we can actually do this
