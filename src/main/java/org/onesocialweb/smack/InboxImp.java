@@ -12,6 +12,10 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
+ *  
+ *  2011-01-16 Modified by Luca Faggioli Copyright 2010 Openliven S.r.l
+ *  
+ *  added notification of new Comments 
  *    
  */
 package org.onesocialweb.smack;
@@ -25,6 +29,7 @@ import org.onesocialweb.client.exception.AuthenticationRequired;
 import org.onesocialweb.client.exception.ConnectionRequired;
 import org.onesocialweb.client.exception.RequestException;
 import org.onesocialweb.model.activity.ActivityEntry;
+
 
 public class InboxImp implements Inbox {
 
@@ -86,7 +91,15 @@ public class InboxImp implements Inbox {
 			int index = entries.indexOf(previousActivity);
 			entries.add(index, entry);
 			entries.remove(previousActivity);
-			notifyMessageUpdated(entry);
+			if ((previousActivity.getRepliesLink()==null) && (entry.getRepliesLink()!=null) && (entry.getRepliesLink().getCount()==1))
+				notifyReplyAdded(entry);
+			else if ((previousActivity.getRepliesLink()!=null) && (entry.getRepliesLink()!=null) && 
+					(previousActivity.getRepliesLink().getCount()<entry.getRepliesLink().getCount())){
+				notifyReplyAdded(entry);								
+			}
+			else{		
+				notifyMessageUpdated(entry);
+			}
 		}
 	}
 
@@ -105,6 +118,12 @@ public class InboxImp implements Inbox {
 	private void notifyMessageUpdated(ActivityEntry activity) {
 		for (InboxEventHandler handler : handlers) {
 			handler.onMessageUpdated(activity);
+		}
+	}
+	
+	private void notifyReplyAdded(ActivityEntry activity) {
+		for (InboxEventHandler handler : handlers) {
+			handler.onReplyAdded(activity);
 		}
 	}	
 	
