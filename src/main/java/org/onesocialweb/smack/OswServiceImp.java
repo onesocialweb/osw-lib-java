@@ -332,9 +332,7 @@ public class OswServiceImp implements OswService {
 
 		// Send the request
 		IQPubSubItems packet = new IQPubSubItems(REPLYSTREAM_NODE+entry.getId());
-		List<ActivityEntry> request=new ArrayList<ActivityEntry>();
-		request.add(entry);
-		packet.setEntries(request);
+
 		packet.setTo(entry.getActor().getUri());
 		IQ result = requestBlocking(packet);
 
