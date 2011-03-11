@@ -93,6 +93,9 @@ public interface OswService {
 	
 	public boolean register(List<FormField> fields) throws ConnectionRequired;
 	
+	public boolean ping() throws ConnectionRequired;
+		
+	
 	public DataForm requestForm() throws ConnectionRequired;
 
 	

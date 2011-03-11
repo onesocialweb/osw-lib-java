@@ -75,6 +75,7 @@ import org.onesocialweb.smack.packet.relation.IQRelationProvider;
 import org.onesocialweb.smack.packet.relation.IQRelationQuery;
 import org.onesocialweb.smack.packet.relation.IQRelationSetup;
 import org.onesocialweb.smack.packet.relation.IQRelationUpdate;
+import org.onesocialweb.smack.packet.utils.IQPing;
 import org.onesocialweb.xml.writer.ActivityXmlWriter;
 
 public class OswServiceImp implements OswService {
@@ -187,6 +188,25 @@ public class OswServiceImp implements OswService {
 		inbox.getEntries().clear();
 		return true;
 	}
+	
+	@Override
+	public boolean ping() throws ConnectionRequired{
+		IQPing ping = new IQPing();
+		ping.setType(IQ.Type.GET);
+		
+
+		// Send the request and process the reply
+		Packet reply = requestBlocking(ping);
+
+		if (reply != null && (reply instanceof IQ)) {
+			IQ result = (IQ) reply;
+			if (result.getType().equals(IQ.Type.RESULT)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	@Override
 	public boolean register(String username, String password, String name, String email) throws ConnectionRequired {
@@ -215,6 +235,8 @@ public class OswServiceImp implements OswService {
 
 		return false;
 	}
+	
+
 	
 	@Override
 	public boolean register(List<FormField> items) throws ConnectionRequired {
